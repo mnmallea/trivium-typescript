@@ -4,16 +4,20 @@ import bitwise, { buffer, string } from "bitwise";
 
 function toBitarray(string: string): trivium.Bitarray {
   const buffer = Buffer.from(string);
-  return bitwise.buffer.read(buffer, 80);
+  return bitwise.buffer.read(buffer);
 }
 
 export function cipher(data: Buffer, key: string, iv: string): Buffer {
-  if (key.length !== 10 && iv.length !== 10) {
+  if (key.length !== 10 || iv.length !== 10) {
     throw new TypeError("Key and IV length should be 10");
   }
-  let state = trivium.initializeInternalState(toBitarray(key), toBitarray(iv));
 
-  const cipherBuffer = new Buffer(data.length);
+  const keyBitarray = toBitarray(key);
+  const ivBitarray = toBitarray(iv);
+
+  let state = trivium.initializeInternalState(keyBitarray, ivBitarray);
+
+  const cipherBuffer = Buffer.alloc(data.length);
 
   for (let i = 0; i < data.length; i++) {
     const dataByte = data.readUInt8(i) as UInt8;
