@@ -71,7 +71,7 @@ export function initializeInternalState(key: Bitarray, initializationVector: Bit
   return state;
 }
 
-function nextState(state: Bitarray): { state: Bitarray, key: Bit } {
+function nextState(state: Bitarray): { state: Bitarray; key: Bit } {
   const newState = Array.from(state);
 
   let t1 = xor(state[65], state[92]);
@@ -91,12 +91,12 @@ function nextState(state: Bitarray): { state: Bitarray, key: Bit } {
   return { key, state: newState };
 }
 
-export function nextByte(state: Bitarray): { state: Bitarray, byte: UInt8 } {
-  var _state = state;
+export function nextByte(state: Bitarray): { state: Bitarray; byte: UInt8 } {
+  let _state = state;
   const byte: Bitarray = new Array(8);
 
   for (let i = 1; i < 8; i++) {
-    let { state: newState, key } = nextState(_state);
+    const { state: newState, key } = nextState(_state);
     _state = newState;
     byte[i] = key;
   }

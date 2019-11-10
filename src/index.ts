@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 import * as trivium from "./trivium";
+import * as cipher from "./cipher";
 import * as fs from "fs";
 import * as readline from "readline";
 import * as util from "util";
 
 const readFile = util.promisify(fs.readFile);
+const writeFile = util.promisify(fs.writeFile);
 
 const args = process.argv.slice(2);
 const filename = args[0];
@@ -30,7 +32,11 @@ async function processFile(filename: string) {
 
   const file = await readFile(filename);
 
-  file.forEach(console.log);
+  const cipherData = cipher.cipher(file, key, iv);
+  const outputFile = `${filename}.ciph`;
+  await writeFile(outputFile, cipherData);
+
+  console.log(`Output sent to ${outputFile}`);
 }
 
 processFile(filename);
