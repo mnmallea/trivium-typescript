@@ -1,19 +1,21 @@
-import * as bitwise from "bitwise";
+import bitwise from "bitwise";
 
 type Bitarray = Array<Bit>;
 type Bit = 0 | 1;
 
-export function xor(...bits: Bitarray): Bit {
+function xor(...bits: Bitarray): Bit {
   return bits.reduce((previous, current) => {
     return bitwise.bits.xor([previous], [current])[0];
   });
 }
 
-export function and(...bits: Bitarray): Bit {
+function and(...bits: Bitarray): Bit {
   return bits.every((b) => b === 1) ? 1 : 0;
 }
 
-function fillInternalState(key: Bitarray, initializationVector: Bitarray, state: Bitarray): void {
+function fillInternalState(key: Bitarray, initializationVector: Bitarray): Bitarray {
+  const state: Bitarray = [];
+
   for (let i = 0; i < 93; i++) {
     if (i < 80) {
       state.push(key[i]);
@@ -37,6 +39,8 @@ function fillInternalState(key: Bitarray, initializationVector: Bitarray, state:
   for (let i = 285; i < 288; i++) {
     state.push(1);
   }
+
+  return state;
 }
 
 function shiftAndReplace(state: Bitarray, replace: Bit, start: number, end: number) {
@@ -50,9 +54,7 @@ function shiftAndReplace(state: Bitarray, replace: Bit, start: number, end: numb
 }
 
 export function initializeInternalState(key: Bitarray, initializationVector: Bitarray): Bitarray {
-  const state: Bitarray = [];
-
-  fillInternalState(key, initializationVector, state);
+  const state: Bitarray = fillInternalState(key, initializationVector);
 
   console.log(state.length);
 
@@ -68,9 +70,4 @@ export function initializeInternalState(key: Bitarray, initializationVector: Bit
 
   state.forEach(console.log);
   return state;
-}
-
-export function encrypt(data: Buffer, key: Bitarray, initializationVector: Bitarray): Buffer {
-  const internalState = initializeInternalState(key, initializationVector);
-  throw ":(";
 }
