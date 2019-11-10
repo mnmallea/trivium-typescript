@@ -8,6 +8,7 @@
     },
     "author": "Bowden Kelly",
     "license": "MIT",
+    "main": "dist/index.js",
     "scripts": {
         "start": "npm run serve",
         "build": "npm run build-ts && npm run lint",
