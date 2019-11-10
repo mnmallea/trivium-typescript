@@ -30,5 +30,10 @@ describe('trivium tests', () => {
       expect(result.slice(80, 92).every((b) => b == 0)).toBe(true);
       expect(result.slice(173, 177).every((b) => b == 0)).toBe(true);
     });
+    
+    test("returns an array with 288 elements", () => {
+      const result = trivium.fillInternalState(keyArray, ivArray);
+      expect(result.length).toBe(288);
+    });
   })
 });
