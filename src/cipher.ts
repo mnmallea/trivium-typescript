@@ -1,19 +1,15 @@
 import { UInt8 } from "bitwise/types";
 import * as trivium from "./trivium";
 import bitwise, { buffer, string } from "bitwise";
-
-function toBitarray(string: string): trivium.Bitarray {
-  const buffer = Buffer.from(string);
-  return bitwise.buffer.read(buffer);
-}
+import * as utils from "./utils";
 
 export function cipher(data: Buffer, key: string, iv: string): Buffer {
   if (key.length !== 10 || iv.length !== 10) {
     throw new TypeError("Key and IV length should be 10");
   }
 
-  const keyBitarray = toBitarray(key);
-  const ivBitarray = toBitarray(iv);
+  const keyBitarray = utils.toBitarray(key);
+  const ivBitarray = utils.toBitarray(iv);
 
   let state = trivium.initializeInternalState(keyBitarray, ivBitarray);
 

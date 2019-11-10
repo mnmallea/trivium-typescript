@@ -12,7 +12,7 @@ function and(...bits: Bitarray): Bit {
   return bitwise.bits.reduceAnd(bits);
 }
 
-function fillInternalState(key: Bitarray, initializationVector: Bitarray): Bitarray {
+export function fillInternalState(key: Bitarray, initializationVector: Bitarray): Bitarray {
   const state: Bitarray = [];
 
   for (let i = 0; i < 80; i++) {

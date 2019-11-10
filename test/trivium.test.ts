@@ -1,4 +1,33 @@
+import * as trivium from '../src/trivium';
+import * as utils from '../src/utils';
 
-test("adds 1 + 2 to equal 3", () => {
-  expect(1 + 2).toBe(3);
+describe('trivium tests', () => {
+  describe('#fillInternalState', () => {
+    const key = 'unodostres';
+    const iv = 'unodostres';
+
+    const keyArray = utils.toBitarray(key);
+    const ivArray = utils.toBitarray(iv);
+
+    test("puts key in correct position", () => {
+      const result = trivium.fillInternalState(keyArray, ivArray);
+      expect(result.slice(0, 80)).toEqual(keyArray);
+    });
+
+    test("puts iv in correct position", () => {
+      const result = trivium.fillInternalState(keyArray, ivArray);
+      expect(result.slice(93, 173)).toEqual(ivArray);
+    });
+
+    test("ends with 1, 1, 1", () => {
+      const result = trivium.fillInternalState(keyArray, ivArray);
+      expect(result.slice(285, 288)).toEqual([1, 1, 1]);
+    });
+
+    test("fills expected sections with 0", () => {
+      const result = trivium.fillInternalState(keyArray, ivArray);
+      expect(result.slice(80, 92).every((b) => b == 0)).toBe(true);
+      expect(result.slice(173, 177).every((b) => b == 0)).toBe(true);
+    });
+  })
 });
