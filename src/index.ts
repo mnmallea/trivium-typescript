@@ -22,6 +22,16 @@ async function processFile(filename: string) {
     });
   };
 
+  let file: Buffer | undefined;
+
+  try {
+    file = await readFile(filename);
+  } catch{
+    file = undefined;
+    console.log("Hay un problema con el archivo :(");
+    process.exit(1);
+  }
+
   console.log(`Encriptando ${filename}`);
 
   const key = await question("Ingrese la clave ultrasecreta: ");
@@ -30,13 +40,13 @@ async function processFile(filename: string) {
   const iv = await question("Ingrese el IV: ");
   console.log(`IV: ${iv}`);
 
-  const file = await readFile(filename);
-
-  const cipherData = cipher.cipher(file, key, iv);
+  const cipherData = cipher.cipher(file as Buffer, key, iv);
   const outputFile = `${filename}.ciph`;
   await writeFile(outputFile, cipherData);
 
   console.log(`Output sent to ${outputFile}`);
+
+  process.exit(0);
 }
 
 processFile(filename);

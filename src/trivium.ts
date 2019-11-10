@@ -39,13 +39,11 @@ export function fillInternalState(key: Bitarray, initializationVector: Bitarray)
     state.push(1);
   }
 
-  const ret = state;
-
-  return ret;
+  return state;
 }
 
-function shiftAndReplace(state: Bitarray, replace: Bit, start: number, end: number) {
-  for (let i = start; i < end; i++) {
+export function shiftAndReplace(state: Bitarray, replace: Bit, start: number, end: number) {
+  for (let i = end - 1; i >= start; i--) {
     if (i == start) {
       state[i] = replace;
     } else {
