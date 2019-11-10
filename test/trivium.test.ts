@@ -1,10 +1,11 @@
 import * as trivium from '../src/trivium';
 import * as utils from '../src/utils';
+import * as faker from 'faker';
 
 describe('trivium tests', () => {
   describe('#fillInternalState', () => {
-    const key = 'unodostres';
-    const iv = 'unodostres';
+    const key = faker.random.uuid().slice(0, 10);
+    const iv = faker.random.uuid().slice(0, 10);
 
     const keyArray = utils.toBitarray(key);
     const ivArray = utils.toBitarray(iv);
