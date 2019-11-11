@@ -11,14 +11,13 @@ export function cipher(data: Buffer, key: string, iv: string): Buffer {
   const keyBitarray = utils.toBitarray(key);
   const ivBitarray = utils.toBitarray(iv);
 
-  let state = trivium.initializeInternalState(keyBitarray, ivBitarray);
+  const state = trivium.initializeInternalState(keyBitarray, ivBitarray);
 
   const cipherBuffer = Buffer.alloc(data.length);
 
   for (let i = 0; i < data.length; i++) {
     const dataByte = data.readUInt8(i) as UInt8;
-    const { state: newState, byte: cipherByte } = trivium.nextByte(state);
-    state = newState;
+    const cipherByte = trivium.nextByte(state);
     cipherBuffer.writeUInt8(cipherByte ^ dataByte, i);
   }
 

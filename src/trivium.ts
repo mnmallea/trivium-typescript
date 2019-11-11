@@ -60,9 +60,7 @@ export function initializeInternalState(key: Bitarray, initializationVector: Bit
   return state;
 }
 
-function nextState(state: Bitarray): { state: Bitarray; key: Bit } {
-  const newState = Array.from(state);
-
+function nextState(state: Bitarray): Bit {
   let t1 = state[65] ^ state[92];
   let t2 = state[161] ^ state[176];
   let t3 = state[242] ^ state[287];
@@ -73,22 +71,20 @@ function nextState(state: Bitarray): { state: Bitarray; key: Bit } {
   t2 = t2 ^ (state[174] & state[175]) ^ state[263];
   t3 = t3 ^ (state[285] & state[286]) ^ state[68];
 
-  shiftAndReplace(newState, t3 as Bit, 0, 93);
-  shiftAndReplace(newState, t1 as Bit, 93, 177);
-  shiftAndReplace(newState, t2 as Bit, 177, 288);
+  shiftAndReplace(state, t3 as Bit, 0, 93);
+  shiftAndReplace(state, t1 as Bit, 93, 177);
+  shiftAndReplace(state, t2 as Bit, 177, 288);
 
-  return { key, state: newState };
+  return key;
 }
 
-export function nextByte(state: Bitarray): { state: Bitarray; byte: UInt8 } {
-  let current = state;
+export function nextByte(state: Bitarray): UInt8 {
   const byte: Bitarray = new Array(8);
 
   for (let i = 1; i < 8; i++) {
-    const { state: newState, key } = nextState(current);
-    current = newState;
+    const key = nextState(state);
     byte[i] = key;
   }
 
-  return { byte: bitwise.byte.write(byte as any), state: current };
+  return bitwise.byte.write(byte as any);
 }
