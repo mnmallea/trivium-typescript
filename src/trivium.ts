@@ -4,14 +4,6 @@ import { UInt8 } from "bitwise/types";
 export type Bitarray = Array<Bit>;
 export type Bit = 0 | 1;
 
-function xor(...bits: Bitarray): Bit {
-  return bitwise.bits.reduceXor(bits);
-}
-
-function and(...bits: Bitarray): Bit {
-  return bitwise.bits.reduceAnd(bits);
-}
-
 export function fillInternalState(key: Bitarray, initializationVector: Bitarray): Bitarray {
   const state: Bitarray = [];
 
@@ -56,13 +48,13 @@ export function initializeInternalState(key: Bitarray, initializationVector: Bit
   const state: Bitarray = fillInternalState(key, initializationVector);
 
   for (let i = 1; i < 4 * 288; i++) {
-    const t1 = xor(state[65], and(state[90], state[91]), state[92], state[170]);
-    const t2 = xor(state[161], and(state[174], state[175]), state[176], state[263]);
-    const t3 = xor(state[242], and(state[285], state[286]), state[287], state[68]);
+    const t1 = state[65] ^ (state[90] & state[91]) ^ state[92] ^ state[170];
+    const t2 = state[161] ^ (state[174] & state[175]) ^ state[176] ^ state[263];
+    const t3 = state[242] ^ (state[285] & state[286]) ^ state[287] ^ state[68];
 
-    shiftAndReplace(state, t3, 0, 93);
-    shiftAndReplace(state, t1, 93, 177);
-    shiftAndReplace(state, t2, 177, 288);
+    shiftAndReplace(state, t3 as Bit, 0, 93);
+    shiftAndReplace(state, t1 as Bit, 93, 177);
+    shiftAndReplace(state, t2 as Bit, 177, 288);
   }
 
   return state;
@@ -71,19 +63,19 @@ export function initializeInternalState(key: Bitarray, initializationVector: Bit
 function nextState(state: Bitarray): { state: Bitarray; key: Bit } {
   const newState = Array.from(state);
 
-  let t1 = xor(state[65], state[92]);
-  let t2 = xor(state[161], state[176]);
-  let t3 = xor(state[242], state[287]);
+  let t1 = state[65] ^ state[92];
+  let t2 = state[161] ^ state[176];
+  let t3 = state[242] ^ state[287];
 
-  const key = xor(t1, t2, t3);
+  const key = (t1 ^ t2 ^ t3) as Bit;
 
-  t1 = xor(t1, and(state[90], state[91]), state[170]);
-  t2 = xor(t2, and(state[174], state[175]), state[263]);
-  t3 = xor(t3, and(state[285], state[286]), state[68]);
+  t1 = t1 ^ (state[90] & state[91]) ^ state[170];
+  t2 = t2 ^ (state[174] & state[175]) ^ state[263];
+  t3 = t3 ^ (state[285] & state[286]) ^ state[68];
 
-  shiftAndReplace(newState, t3, 0, 93);
-  shiftAndReplace(newState, t1, 93, 177);
-  shiftAndReplace(newState, t2, 177, 288);
+  shiftAndReplace(newState, t3 as Bit, 0, 93);
+  shiftAndReplace(newState, t1 as Bit, 93, 177);
+  shiftAndReplace(newState, t2 as Bit, 177, 288);
 
   return { key, state: newState };
 }

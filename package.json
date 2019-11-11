@@ -1,5 +1,5 @@
 {
-    "name": "express-typescript-starter",
+    "name": "trivium-typescript",
     "version": "0.1.0",
     "description": "A starting point for Node.js express apps with TypeScript",
     "repository": {
@@ -9,6 +9,9 @@
     "author": "Bowden Kelly",
     "license": "MIT",
     "main": "dist/index.js",
+    "bin": {
+        "trivium": "./dist/index.js"
+    },
     "scripts": {
         "start": "npm run serve",
         "build": "npm run build-ts && npm run lint",
