@@ -17,14 +17,9 @@ export function cipher(data: Buffer, key: string, iv: string): Buffer {
 
   for (let i = 0; i < data.length; i++) {
     const dataByte = data.readUInt8(i) as UInt8;
-    const { state: newState, byte } = trivium.nextByte(state);
+    const { state: newState, byte: cipherByte } = trivium.nextByte(state);
     state = newState;
-    const dataArray = bitwise.byte.read(dataByte as UInt8);
-    const byteArray = bitwise.byte.read(byte);
-
-    const number = bitwise.bits.xor(dataArray, byteArray);
-
-    cipherBuffer.writeUInt8(bitwise.byte.write(number as any), i);
+    cipherBuffer.writeUInt8(cipherByte ^ dataByte, i);
   }
 
   return cipherBuffer;
