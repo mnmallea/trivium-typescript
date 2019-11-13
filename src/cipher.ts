@@ -1,6 +1,5 @@
 import { UInt8 } from "bitwise/types";
 import * as trivium from "./trivium";
-import bitwise, { buffer, string } from "bitwise";
 import * as utils from "./utils";
 
 export function cipher(data: Buffer, key: string, iv: string): Buffer {

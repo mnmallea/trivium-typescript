@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import * as trivium from "./trivium";
 import * as cipher from "./cipher";
 import * as fs from "fs";
 import * as readline from "readline";
