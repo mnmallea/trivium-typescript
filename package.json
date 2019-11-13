@@ -1,5 +1,5 @@
 {
-    "name": "express-typescript-starter",
+    "name": "trivium-typescript",
     "version": "0.1.0",
     "description": "A starting point for Node.js express apps with TypeScript",
     "repository": {
@@ -8,6 +8,10 @@
     },
     "author": "Bowden Kelly",
     "license": "MIT",
+    "main": "dist/index.js",
+    "bin": {
+        "trivium": "./dist/index.js"
+    },
     "scripts": {
         "start": "npm run serve",
         "build": "npm run build-ts && npm run lint",
@@ -15,6 +19,7 @@
         "watch-node": "nodemon dist/index.js",
         "watch": "concurrently -k -p \"[{name}]\" -n \"Sass,TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-sass\" \"npm run watch-ts\" \"npm run watch-node\"",
         "test": "jest --forceExit --coverage --verbose",
+        "test-debug": "node --inspect node_modules/.bin/jest --runInBand",
         "watch-test": "npm run test -- --watchAll",
         "build-ts": "tsc",
         "watch-ts": "tsc -w",
@@ -24,18 +29,25 @@
         "watch-debug": "concurrently -k -p \"[{name}]\" -n \"Sass,TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-sass\" \"npm run watch-ts\" \"npm run serve-debug\""
     },
     "dependencies": {
+        "bitwise": "^2.0.4",
         "dotenv": "^8.1.0"
     },
     "devDependencies": {
+        "@babel/core": "^7.7.2",
+        "@babel/preset-env": "^7.7.1",
+        "@babel/preset-typescript": "^7.7.2",
         "@types/chai": "^4.2.3",
         "@types/dotenv": "^6.1.1",
         "@types/eslint": "^6.1.1",
+        "@types/faker": "^4.1.7",
         "@types/jest": "^24.0.18",
         "@types/node": "^12.7.8",
         "@types/supertest": "^2.0.8",
         "@typescript-eslint/eslint-plugin": "^2.3.1",
         "@typescript-eslint/parser": "^2.3.1",
+        "babel-jest": "^24.9.0",
         "eslint": "^6.4.0",
+        "faker": "^4.1.0",
         "jest": "^24.9.0",
         "shelljs": "^0.8.3",
         "supertest": "^4.0.2",
