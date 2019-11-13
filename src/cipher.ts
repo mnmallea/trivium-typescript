@@ -2,11 +2,11 @@ import { UInt8, Bit } from "bitwise/types";
 import * as trivium from "./trivium";
 import * as utils from "./utils";
 
-export function encryptBuffer(data: Buffer, encrypted: Buffer, state: trivium.Bitarray, length: number = data.length): void {
+export function encryptBuffer(buffer: Buffer, state: trivium.Bitarray, length: number = buffer.length): void {
   for (let i = 0; i < length; i++) {
-    const dataByte = data.readUInt8(i) as UInt8;
+    const dataByte = buffer.readUInt8(i) as UInt8;
     const cipherByte = trivium.nextByte(state);
-    encrypted.writeUInt8(cipherByte ^ dataByte, i);
+    buffer.writeUInt8(cipherByte ^ dataByte, i);
   }
 }
 

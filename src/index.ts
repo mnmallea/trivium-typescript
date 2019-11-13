@@ -63,18 +63,17 @@ async function processFile(filename: string) {
     process.exit(1);
   }
 
-  const readBuffer = Buffer.alloc(CHUNK_SIZE);
-  const writeBuffer = Buffer.alloc(CHUNK_SIZE);
+  const buffer = Buffer.alloc(CHUNK_SIZE);
 
   const state = cipher.buildInternalState(key, iv);
 
   let dataLength = 0;
 
-  let { bytesRead } = await read(file as number, readBuffer, 0, CHUNK_SIZE, null);
+  let { bytesRead } = await read(file as number, buffer, 0, CHUNK_SIZE, null);
   while (bytesRead !== 0) {
-    cipher.encryptBuffer(readBuffer, writeBuffer, state, bytesRead);
-    write(outputFile as number, writeBuffer, 0, bytesRead);
-    bytesRead = (await read(file as number, readBuffer, 0, CHUNK_SIZE, null)).bytesRead;
+    cipher.encryptBuffer(buffer, state, bytesRead);
+    await write(outputFile as number, buffer, 0, bytesRead);
+    bytesRead = (await read(file as number, buffer, 0, CHUNK_SIZE, null)).bytesRead;
     dataLength += CHUNK_SIZE;
   }
 
