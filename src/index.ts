@@ -12,7 +12,7 @@ const write = util.promisify(fs.write);
 const args = process.argv.slice(2);
 const filename = args[0];
 
-const CHUNK_SIZE = Number(process.env["CHUNK_SIZE"]) || 100000;
+const CHUNK_SIZE = Number(process.env["CHUNK_SIZE"]) || 1024;
 
 function humanFileSize(bytes: number, si: boolean = false) {
   const thresh = si ? 1000 : 1024;
@@ -52,39 +52,30 @@ async function processFile(filename: string) {
   const start = process.hrtime();
 
   const outputFilename = `${filename}.ciph`;
-  let file: number | undefined = undefined;
-  let outputFile: number | undefined = undefined;
 
-  try {
-    file = await openFile(filename, "r");
-    outputFile = await openFile(outputFilename, "w");
-  } catch{
-    console.log("Hay un problema con el archivo :(");
-    process.exit(1);
-  }
-
-  const buffer = Buffer.alloc(CHUNK_SIZE);
+  const readStream = fs.createReadStream(filename, { highWaterMark: CHUNK_SIZE });
+  const writeStream = fs.createWriteStream(outputFilename);
 
   const state = cipher.buildInternalState(key, iv);
 
   let dataLength = 0;
 
-  let { bytesRead } = await read(file as number, buffer, 0, CHUNK_SIZE, null);
-  while (bytesRead !== 0) {
-    cipher.encryptBuffer(buffer, state, bytesRead);
-    await write(outputFile as number, buffer, 0, bytesRead);
-    bytesRead = (await read(file as number, buffer, 0, CHUNK_SIZE, null)).bytesRead;
-    dataLength += CHUNK_SIZE;
-  }
+  readStream.on("data", (chunk: Buffer) => {
+    cipher.encryptChunkToStream(chunk, writeStream, state);
+    dataLength += chunk.length;
+  });
 
-  await Promise.all([closeFile(file as number), closeFile(outputFile as number)]);
+  readStream.on("close", () => {
+    writeStream.end();
+  });
 
-  const end = process.hrtime(start);
-  console.log(`\nArchivo cifrado en ${outputFilename}`);
-  console.log(`Cifrados ${humanFileSize(dataLength)} en %ds %dms`, end[0], end[1] / 1000000);
-  console.log(`Velocidad: ${(dataLength * 8 / (end[0] + end[1] / 1e9)) / 1e6} Mbps`);
-
-  process.exit(0);
+  writeStream.on("finish", () => {
+    const end = process.hrtime(start);
+    console.log(`\nArchivo cifrado en ${outputFilename}`);
+    console.log(`Cifrados ${humanFileSize(dataLength)} en %ds %dms`, end[0], end[1] / 1000000);
+    console.log(`Velocidad: ${(dataLength * 8 / (end[0] + end[1] / 1e9)) / 1e6} Mbps`);
+    process.exit(0);
+  });
 }
 
 processFile(filename);
