@@ -1,17 +1,8 @@
-import { UInt8 } from "bitwise/types";
+import { UInt8, Bit } from "bitwise/types";
 import * as trivium from "./trivium";
 import * as utils from "./utils";
 
-export function cipher(data: Buffer, key: string, iv: string): Buffer {
-  if (key.length !== 10 || iv.length !== 10) {
-    throw new TypeError("Key and IV length should be 10");
-  }
-
-  const keyBitarray = utils.toBitarray(key);
-  const ivBitarray = utils.toBitarray(iv);
-
-  const state = trivium.initializeInternalState(keyBitarray, ivBitarray);
-
+export function encryptBuffer(data: Buffer, state: trivium.Bitarray): Buffer {
   const cipherBuffer = Buffer.alloc(data.length);
 
   for (let i = 0; i < data.length; i++) {
@@ -21,4 +12,15 @@ export function cipher(data: Buffer, key: string, iv: string): Buffer {
   }
 
   return cipherBuffer;
+}
+
+export function buildInternalState(key: string, iv: string): trivium.Bitarray {
+  if (key.length !== 10 || iv.length !== 10) {
+    throw new TypeError("Key and IV length should be 10");
+  }
+
+  const keyBitarray = utils.toBitarray(key);
+  const ivBitarray = utils.toBitarray(iv);
+
+  return trivium.initializeInternalState(keyBitarray, ivBitarray);
 }

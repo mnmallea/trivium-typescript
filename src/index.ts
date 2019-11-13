@@ -4,11 +4,15 @@ import * as fs from "fs";
 import * as readline from "readline";
 import * as util from "util";
 
-const readFile = util.promisify(fs.readFile);
-const writeFile = util.promisify(fs.writeFile);
+const openFile = util.promisify(fs.open);
+const closeFile = util.promisify(fs.close);
+const read = util.promisify(fs.read);
+const write = util.promisify(fs.write);
 
 const args = process.argv.slice(2);
 const filename = args[0];
+
+const CHUNK_SIZE = Number(process.env["CHUNK_SIZE"]) || 100000;
 
 function humanFileSize(bytes: number, si: boolean = false) {
   const thresh = si ? 1000 : 1024;
@@ -47,24 +51,36 @@ async function processFile(filename: string) {
 
   const start = process.hrtime();
 
-  let file: Buffer | undefined;
+  const outputFilename = `${filename}.ciph`;
+  let file: number | undefined = undefined;
+  let outputFile: number | undefined = undefined;
 
   try {
-    file = await readFile(filename);
+    file = await openFile(filename, "r");
+    outputFile = await openFile(outputFilename, "w");
   } catch{
-    file = undefined;
     console.log("Hay un problema con el archivo :(");
     process.exit(1);
   }
 
-  const cipherData = cipher.cipher(file as Buffer, key, iv);
-  const outputFile = `${filename}.ciph`;
-  await writeFile(outputFile, cipherData);
+  const readBuffer = Buffer.alloc(CHUNK_SIZE);
+
+  const state = cipher.buildInternalState(key, iv);
+
+  let dataLength = 0;
+
+  while ((await read(file as number, readBuffer, 0, CHUNK_SIZE, null)).bytesRead !== 0) {
+    const cipheredData = cipher.encryptBuffer(readBuffer, state);
+    write(outputFile as number, cipheredData);
+    dataLength += CHUNK_SIZE;
+  }
+
+  await Promise.all([closeFile(file as number), closeFile(outputFile as number)]);
 
   const end = process.hrtime(start);
-  console.log(`\nArchivo cifrado en ${outputFile}`);
-  console.log(`Cifrados ${humanFileSize(cipherData.length)} en %ds %dms`, end[0], end[1] / 1000000);
-  console.log(`Velocidad: ${(cipherData.length * 8 / (end[0] + end[1] / 1e9)) / 1e6} Mbps`);
+  console.log(`\nArchivo cifrado en ${outputFilename}`);
+  console.log(`Cifrados ${humanFileSize(dataLength)} en %ds %dms`, end[0], end[1] / 1000000);
+  console.log(`Velocidad: ${(dataLength * 8 / (end[0] + end[1] / 1e9)) / 1e6} Mbps`);
 
   process.exit(0);
 }
