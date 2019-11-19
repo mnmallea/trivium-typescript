@@ -22,3 +22,13 @@ export function cipher(data: Buffer, key: string, iv: string): Buffer {
 
   return cipherBuffer;
 }
+
+export function cipherBmp(data: Buffer, key: string, iv: string): Buffer {
+  const BMP_HEADER_SIZE = 54;
+  const header = data.slice(0, BMP_HEADER_SIZE);
+  const payload = data.slice(BMP_HEADER_SIZE);
+
+  const cipheredPayload = cipher(payload, key, iv);
+
+  return Buffer.concat([header, cipheredPayload]);
+}
