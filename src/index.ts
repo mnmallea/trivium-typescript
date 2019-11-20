@@ -71,11 +71,13 @@ async function processFile(filename: string) {
   let dataLength = 0;
 
   let { bytesRead } = await read(file as number, readBuffer, 0, CHUNK_SIZE, null);
+  dataLength += bytesRead;
+
   while (bytesRead !== 0) {
     cipher.encryptBuffer(readBuffer, writeBuffer, state, bytesRead);
     write(outputFile as number, writeBuffer, 0, bytesRead);
     bytesRead = (await read(file as number, readBuffer, 0, CHUNK_SIZE, null)).bytesRead;
-    dataLength += CHUNK_SIZE;
+    dataLength += bytesRead;
   }
 
   await Promise.all([closeFile(file as number), closeFile(outputFile as number)]);
