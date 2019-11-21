@@ -36,7 +36,7 @@ export function fillInternalState(key: Bitarray, initializationVector: Bitarray)
 
 export function shiftAndReplace(state: Bitarray, replace: Bit, start: number, end: number) {
   for (let i = end - 1; i >= start; i--) {
-    if (i == start) {
+    if (i === start) {
       state[i] = replace;
     } else {
       state[i] = state[i - 1];
@@ -47,7 +47,7 @@ export function shiftAndReplace(state: Bitarray, replace: Bit, start: number, en
 export function initializeInternalState(key: Bitarray, initializationVector: Bitarray): Bitarray {
   const state: Bitarray = fillInternalState(key, initializationVector);
 
-  for (let i = 1; i < 4 * 288; i++) {
+  for (let i = 1; i <= 4 * 288; i++) {
     const t1 = state[65] ^ (state[90] & state[91]) ^ state[92] ^ state[170];
     const t2 = state[161] ^ (state[174] & state[175]) ^ state[176] ^ state[263];
     const t3 = state[242] ^ (state[285] & state[286]) ^ state[287] ^ state[68];
@@ -81,7 +81,7 @@ function nextState(state: Bitarray): Bit {
 export function nextByte(state: Bitarray): UInt8 {
   const byte: Bitarray = new Array(8);
 
-  for (let i = 1; i < 8; i++) {
+  for (let i = 0; i < 8; i++) {
     const key = nextState(state);
     byte[i] = key;
   }
